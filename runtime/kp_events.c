@@ -35,7 +35,7 @@
 const char *kp_event_tostr(ktap_state_t *ks)
 {
 	struct ktap_event_data *e = ks->current_event;
-	struct ftrace_event_call *call;
+	trace_event_call *call;
 	struct trace_iterator *iter;
 	struct trace_event *ev;
 	enum print_line_t ret = TRACE_TYPE_NO_CONSUME;
@@ -74,7 +74,7 @@ const char *kp_event_tostr(ktap_state_t *ks)
 
 	if (ret != TRACE_TYPE_NO_CONSUME) {
 		struct trace_seq *s = &iter->seq;
-		int len = s->len >= PAGE_SIZE ? PAGE_SIZE - 1 : s->len;
+		int len = TRACE_SEQ_LEN(s) >= PAGE_SIZE ? PAGE_SIZE - 1 : TRACE_SEQ_LEN(s);
 
 		s->buffer[len] = '\0';
 		return &s->buffer[0];
@@ -116,7 +116,7 @@ struct ftrace_event_field {
 	int                     is_signed;
 };
 
-static struct list_head *get_fields(struct ftrace_event_call *event_call)
+static struct list_head *get_fields(trace_event_call *event_call)
 {
 	if (!event_call->class->get_fields)
 		return &event_call->class->fields;
@@ -178,7 +178,7 @@ void kp_event_getarg(ktap_state_t *ks, ktap_val_t *ra, int idx)
 /* init all fields of event, for quick arg1..arg9 access */
 static int init_event_fields(ktap_state_t *ks, struct ktap_event *event)
 {
-	struct ftrace_event_call *event_call = event->perf->tp_event; 
+	trace_event_call *event_call = event->perf->tp_event;
 	struct ktap_event_field *event_fields = &event->fields[0];
 	struct ftrace_event_field *field;
 	struct list_head *head;
@@ -393,6 +393,13 @@ int kp_event_create(ktap_state_t *ks, struct perf_event_attr *attr,
 }
 
 /*
+ * tracepoint_probe_register functions changed prototype by introduce
+ * 'struct tracepoint', this cause hard to refer tracepoint by name.
+ * And these ktap raw tracepoint interface is not courage to use, so disable
+ * it now.
+ */
+#if 0
+/*
  * Ignore function proto in here, just use first argument.
  */
 static void probe_callback(void *__data)
@@ -511,7 +518,7 @@ static void dry_run_callback(void *data, struct pt_regs *regs, long id)
 
 static void init_syscall_event_fields(struct ktap_event *event, int is_enter)
 {
-	struct ftrace_event_call *event_call;
+	trace_event_call *event_call;
 	struct ktap_event_field *event_fields = &event->fields[0];
 	struct syscall_metadata *meta = syscalls_metadata[event->syscall_nr];
 	int idx = 0;
@@ -554,8 +561,8 @@ static void init_syscall_event_fields(struct ktap_event *event, int is_enter)
 			break;
 		}
 #else
-#error "don't support syscall tracepoint event register access in this arch, "
-	"use 'trace syscalls:* {}' instead"
+#warning "don't support syscall tracepoint event register access in this arch, use 'trace syscalls:* {}' instead"
+		break;
 #endif
 	}
 
@@ -698,6 +705,8 @@ int kp_event_create_tracepoint(ktap_state_t *ks, const char *event_name,
 	return 0;
 }
 
+#endif
+
 /* kprobe handler */
 static int __kprobes pre_handler_kprobe(struct kprobe *p, struct pt_regs *regs)
 {
@@ -782,12 +791,14 @@ static void events_destroy(ktap_state_t *ks)
 					   list);
 		if (event->type == KTAP_EVENT_TYPE_PERF)
 			perf_event_release_kernel(event->perf);
+#if 0
 		else if (event->type == KTAP_EVENT_TYPE_TRACEPOINT)
 			tracepoint_probe_unregister(getstr(event->name),
 						    probe_callback, event);
 		else if (event->type == KTAP_EVENT_TYPE_SYSCALL_ENTER ||
 			 event->type == KTAP_EVENT_TYPE_SYSCALL_EXIT )
 			syscall_event_unregister(ks, event);
+#endif
 		else if (event->type == KTAP_EVENT_TYPE_KPROBE)
 			unregister_kprobe(&event->kp);
         }

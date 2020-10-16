@@ -47,7 +47,7 @@ mod:
 modules_install:
 	$(MAKE) -C $(KERNEL_SRC) M=$(PWD) modules_install
 
-KTAPC_CFLAGS = -Wall -O2
+KTAPC_CFLAGS = -Wall -O2 $(CPPFLAGS)
 
 
 # try-cc
@@ -81,7 +81,7 @@ ifdef NO_LIBELF
 	KTAPC_CFLAGS += -DNO_LIBELF
 else
 ifneq ($(call try-cc,$(SOURCE_LIBELF),$(FLAGS_LIBELF),libelf),y)
-    $(warning No libelf found, disables symbol resolving, please install elfutils-libelf-devel/libelf-dev);
+    $(warning No libelf found, disables symbol resolving, please install elfutils-libelf-devel);
     NO_LIBELF := 1
     KTAPC_CFLAGS += -DNO_LIBELF
 else
@@ -123,13 +123,15 @@ KTAPOBJS += $(UDIR)/kp_symbol.o
 endif
 
 ktap: $(KTAPOBJS) KTAP-CFLAGS
-	$(QUIET_LINK)$(CC) $(KTAPC_CFLAGS) -o $@ $(KTAPOBJS) $(KTAP_LIBS)
+	$(QUIET_LINK)$(CC) $(LDFLAGS) $(KTAPC_CFLAGS) -o $@ $(KTAPOBJS) $(KTAP_LIBS)
 
 KMISC := /lib/modules/$(KVERSION)/ktapvm/
 
 install: mod ktap
-	make modules_install ktapvm.ko
-	install -c ktap /usr/bin/
+	make modules_install ktapvm.ko INSTALL_MOD_PATH=$(DESTDIR)
+	install -D -t $(DESTDIR)/usr/bin/ ktap
+
+install_vim:
 	mkdir -p ~/.vim/ftdetect
 	mkdir -p ~/.vim/syntax
 	cp vim/ftdetect/ktap.vim ~/.vim/ftdetect/

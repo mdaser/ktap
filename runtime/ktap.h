@@ -5,6 +5,10 @@
 #include <linux/hardirq.h>
 #include <linux/trace_seq.h>
 
+#ifndef raw_cpu_ptr
+#define raw_cpu_ptr __this_cpu_ptr
+#endif
+
 /* for built-in library C function register */
 typedef struct ktap_libfunc {
         const char *name; /* function name */
@@ -49,7 +53,7 @@ static __always_inline int trace_get_context_bit(void)
 static __always_inline int get_recursion_context(ktap_state_t *ks)
 {
 	int rctx = trace_get_context_bit();
-	int *val = __this_cpu_ptr(G(ks)->recursion_context[rctx]);
+	int *val = raw_cpu_ptr(G(ks)->recursion_context[rctx]);
 
 	if (*val)
 		return -1;
@@ -60,7 +64,7 @@ static __always_inline int get_recursion_context(ktap_state_t *ks)
 
 static inline void put_recursion_context(ktap_state_t *ks, int rctx)
 {
-	int *val = __this_cpu_ptr(G(ks)->recursion_context[rctx]);
+	int *val = raw_cpu_ptr(G(ks)->recursion_context[rctx]);
 	*val = false;
 }
 
@@ -176,6 +180,20 @@ void __kp_bputs(ktap_state_t *ks, const char *str);
 
 #define err2msg(em)     (kp_err_allmsg+(int)(em))
 extern const char *kp_err_allmsg;
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+#define TRACE_SEQ_LEN(s) ((s)->len)
+#define TRACE_SEQ_READPOS(s) ((s)->readpos)
+#else
+#define TRACE_SEQ_LEN(s) ((s)->seq.len) /** XXX: trace_seq_used() */
+#define TRACE_SEQ_READPOS(s) ((s)->seq.readpos)
+#endif
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
+#define TRACE_SEQ_PRINTF(...) ({ trace_seq_printf(__VA_ARGS__); })
+#else
+#define TRACE_SEQ_PRINTF(s, ...) ({ trace_seq_printf(s, __VA_ARGS__); !trace_seq_has_overflowed(s); })
+#endif
 
 #endif /* __KTAP_H__ */
 

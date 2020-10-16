@@ -364,7 +364,7 @@ entry in `/sys/kernel/debug/tracing/trace`
 **probename**
 
 Event name. Each event has a name associated with it.
-(Dtrace also have 'probename' keyword)
+(DTrace also have 'probename' keyword)
 
 ## Timer syntax
 
@@ -406,7 +406,7 @@ simple event tracing
 
 # Overhead/Performance
 
-* ktap has a much shorter startup time than SystemTap (try the helloword script).
+* ktap has a much shorter startup time than SystemTap (try the helloworld script).
 * ktap has a smaller memory footprint than SystemTap
 * Some scripts show that ktap has a little lower overhead than SystemTap
 (See more performance comparison between ktap and stap in test/benchmark/.
@@ -498,14 +498,15 @@ A: The current plan is to deliver stable ktapvm kernel modules, more ktap script
 # References
 
 * [Linux Performance Analysis and Tools][REF1]
-* [Dtrace Blog][REF2]
-* [Dtrace User Guide][REF3]
+* [DTrace Blog][REF2]
+* [DTrace User Guide][REF3]
 * [LWN: ktap -- yet another kernel tracer][REF4]
 * [LWN: Ktap almost gets into 3.13][REF5]
 * [staging: ktap: add to the kernel tree][REF6]
 * [ktap introduction in LinuxCon Japan 2013][REFR7(content is out of date)
 * [ktap Examples by Brendan Gregg][REFR8
 * [What Linux can learn from Solaris performance, and vice-versa][REF9]
+* [Ktap or BPF?][REF10]
 
 [REF1]: http://www.brendangregg.com/Slides/SCaLE_Linux_Performance2013.pdf
 [REF2]: http://dtrace.org/blogs/
@@ -516,6 +517,7 @@ A: The current plan is to deliver stable ktapvm kernel modules, more ktap script
 [REF7]: http://events.linuxfoundation.org/sites/events/files/lcjpcojp13_zhangwei.pdf
 [REF8]: http://www.brendangregg.com/ktap.html
 [REF9]: http://www.slideshare.net/brendangregg/what-linux-can-learn-from-solaris-performance-and-viceversa
+[REF10]: http://lwn.net/Articles/595565/
 
 # History
 
