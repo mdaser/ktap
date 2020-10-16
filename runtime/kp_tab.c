@@ -3,7 +3,7 @@
  *
  * This file is part of ktap by Jovi Zhangwei.
  *
- * Copyright (C) 2012-2013 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
+ * Copyright (C) 2012-2014 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
  *
  * Adapted from luajit and lua interpreter.
  * Copyright (C) 2005-2014 Mike Pall.
@@ -100,7 +100,6 @@ int newhpart(ktap_state_t *ks, ktap_tab_t *t, uint32_t hbits)
 	kp_assert(hbits != 0);
 
 	if (hbits > KP_MAX_HBITS) {
-		//kp_error(ks, LJ_ERR_TABOV);
 		kp_error(ks, "table overflow\n");
 		return -1;
 	}
@@ -387,7 +386,6 @@ static ktap_val_t *kp_tab_newkey(ktap_state_t *ks, ktap_tab_t *t,
 			  freenode <= nodebase+t->hmask+1);
 		do {
 			if (freenode == nodebase) {  /* No free node found? */
-				//kp_error(ks, LJ_ERR_TABOV);
 				kp_error(ks, "table overflow\n");
 				return NULL;
 			}
@@ -569,7 +567,6 @@ static ktap_val_t *tab_set(ktap_state_t *ks, ktap_tab_t *t,
 		return tab_setstr(ks, t, ts);
 		/* Else use the generic lookup. */
 	} else if (is_nil(key)) {
-		//kp_error(ks, LJ_ERR_NILIDX);
 		kp_error(ks, "table nil index\n");
 		return NULL;
 	}
@@ -637,7 +634,6 @@ static uint32_t keyindex(ktap_state_t *ks, ktap_tab_t *t,
 				return t->asize + (uint32_t)(n - (t->node));
 			/* Hash key indexes: [t->asize..t->asize+t->nmask] */
 		} while ((n = n->next));
-		//kp_err_msg(ks, LJ_ERR_NEXTIDX);
 		kp_error(ks, "table next index\n");
 		return 0;  /* unreachable */
 	}
@@ -843,3 +839,4 @@ void kp_tab_print_hist(ktap_state_t *ks, ktap_tab_t *t, int n)
 	kp_printf(ks, "%31s%s%s\n", "value ", DISTRIBUTION_STR, " count");
 	tab_histdump(ks, t, n);
 }
+

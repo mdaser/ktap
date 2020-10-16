@@ -1,9 +1,9 @@
 /*
- * kp_amalg.c - ktapvm kernel module amalgamation.
+ * amalg.c - ktapvm kernel module amalgamation.
  *
  * This file is part of ktap by Jovi Zhangwei.
  *
- * Copyright (C) 2012-2013 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
+ * Copyright (C) 2012-2014 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
  *
  * ktap is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -35,11 +35,3 @@
 #include "lib_table.c"
 #include "lib_net.c"
 
-#ifdef CONFIG_KTAP_FFI
-#include "ffi/ffi_call.c"
-#include "ffi/ffi_type.c"
-#include "ffi/ffi_symbol.c"
-#include "ffi/cdata.c"
-#include "ffi/ffi_util.c"
-#include "lib_ffi.c"
-#endif

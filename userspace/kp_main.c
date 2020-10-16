@@ -3,7 +3,7 @@
  *
  * This file is part of ktap by Jovi Zhangwei.
  *
- * Copyright (C) 2012-2013 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
+ * Copyright (C) 2012-2014 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
  *
  * ktap is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -38,7 +38,6 @@
 #include "kp_lex.h"
 #include "kp_parse.h"
 #include "kp_symbol.h"
-#include "cparser.h"
 
 static void usage(const char *msg_fmt, ...)
 {
@@ -304,11 +303,7 @@ static void parse_option(int argc, char **argv)
 			}
 			break;
 		case 'V':
-#ifdef CONFIG_KTAP_FFI
-			usage("%s (with FFI)\n\n", KTAP_VERSION);
-#else
 			usage("%s\n\n", KTAP_VERSION);
-#endif
 			break;
 		case '?':
 		case 'h':
@@ -349,7 +344,6 @@ static void compile(const char *input)
 	kp_str_resize();
 
 	if (oneline_src[0] != '\0') {
-		ffi_cparser_init();
 		pt = parse(input, oneline_src);
 		goto dump;
 	}
@@ -367,7 +361,6 @@ static void compile(const char *input)
 	if (buff == MAP_FAILED)
 		handle_error("mmap failed");
 
-	ffi_cparser_init();
 	pt = parse(input, buff);
 
 	munmap(buff, sb.st_size);
@@ -375,9 +368,6 @@ static void compile(const char *input)
 
  dump:
 	if (dump_bytecode) {
-#ifdef CONFIG_KTAP_FFI
-		kp_dump_csymbols();
-#endif
 		kp_dump_proto(pt);
 		exit(0);
 	}
@@ -388,7 +378,6 @@ static void compile(const char *input)
 		handle_error("malloc failed");
 
 	kp_bcwrite(pt, kp_writer, NULL, 0);
-	ffi_cparser_free();
 }
 
 int main(int argc, char **argv)

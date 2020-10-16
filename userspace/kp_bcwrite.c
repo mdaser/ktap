@@ -3,7 +3,7 @@
  *
  * This file is part of ktap by Jovi Zhangwei.
  *
- * Copyright (C) 2012-2013 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
+ * Copyright (C) 2012-2014 Jovi Zhangwei <jovi.zhangwei@gmail.com>.
  *
  * Copyright (C) 1994-2013 Lua.org, PUC-Rio.
  *  - The part of code in this file is copied from lua initially.
@@ -28,7 +28,6 @@
 #include <string.h>
 
 #include "../include/ktap_types.h"
-#include "cparser.h"
 #include "kp_util.h"
 
 /* Context for bytecode writer. */
